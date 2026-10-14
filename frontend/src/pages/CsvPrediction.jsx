@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import axios from "axios";
 
-const API = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
+const API = import.meta.env.VITE_API_URL ?? "";
 
 const CsvPrediction = () => {
   const [file, setFile] = useState(null);
@@ -122,8 +122,12 @@ const CsvPrediction = () => {
         setError("Invalid response format from prediction API.");
       }
     } catch (err) {
-      const detail = err.response?.data?.detail;
-      setError(detail || "Prediction failed");
+      const detail =
+        err.response?.data?.detail ||
+        (!err.response
+          ? "Cannot connect to Backend Server (127.0.0.1:8000). Please ensure backend is running."
+          : err.message || "Prediction failed");
+      setError(detail);
     } finally {
       setLoading(false);
     }
@@ -152,7 +156,12 @@ const CsvPrediction = () => {
         await executePrediction(selectedFile, suggested);
       }
     } catch (err) {
-      setError(err.response?.data?.detail || "Failed to upload file");
+      const detail =
+        err.response?.data?.detail ||
+        (!err.response
+          ? "Cannot connect to Backend Server (127.0.0.1:8000). Please ensure backend is running."
+          : err.message || "Failed to upload file");
+      setError(detail);
     } finally {
       setLoading(false);
     }

@@ -9,9 +9,9 @@ uploads/
 # Database
 *.db
 
-# Models
-models/*.pkl
-models/*.joblib
+# Models (keep .pkl files - needed for Railway deployment)
+# models/*.pkl
+# models/*.joblib
 models/*.h5
 
 # Frontend
@@ -25,5 +25,5 @@ frontend/dist/
 reports/
 scratch/
 
-# Env
+# Env (local only - .env.production is tracked for Railway)
 .env

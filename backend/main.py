@@ -1,5 +1,7 @@
 from fastapi import FastAPI, UploadFile, File, HTTPException, Depends, Form
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import HTMLResponse
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
 import pandas as pd
@@ -995,3 +997,27 @@ def get_thresholds():
             detail="Quality thresholds configuration could not be loaded."
         )
     return thresholds
+
+
+@app.get("/health")
+def health_check():
+    return {"status": "ok"}
+
+
+# ---------------------------------------------------------------------------
+# Serve the built React frontend (for Railway single-service deployment)
+# ---------------------------------------------------------------------------
+_FRONTEND_DIST = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "frontend", "dist"
+)
+
+if os.path.isdir(_FRONTEND_DIST):
+    # Mount static assets (JS, CSS, images, etc.)
+    app.mount("/assets", StaticFiles(directory=os.path.join(_FRONTEND_DIST, "assets")), name="assets")
+
+    @app.get("/{full_path:path}", response_class=HTMLResponse, include_in_schema=False)
+    async def serve_spa(full_path: str):
+        """Catch-all: serve index.html for any unknown path (React Router SPA)."""
+        index_file = os.path.join(_FRONTEND_DIST, "index.html")
+        with open(index_file, "r", encoding="utf-8") as f:
+            return HTMLResponse(content=f.read())

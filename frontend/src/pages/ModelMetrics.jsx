@@ -22,7 +22,7 @@ const ModelMetrics = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const API = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
+        const API = import.meta.env.VITE_API_URL ?? "";
         const [metricsRes, logsRes] = await Promise.all([
           axios.get(`${API}/metrics`),
           axios.get(`${API}/logs`),
